@@ -177,7 +177,8 @@ function hhmmToMin(s) {
 function parseOpenMeteo(j) {
     if (!j || !j.current) return null;
     var wx = { code: +j.current.weather_code, temp: +j.current.temperature_2m, wind: +j.current.wind_speed_10m,
-               sunrise: null, sunset: null, at: Date.now() };
+               sunrise: null, sunset: null, at: Date.now(),
+               offset: j.utc_offset_seconds !== undefined ? j.utc_offset_seconds / 60 : null };
     try { wx.sunrise = hhmmToMin(j.daily.sunrise[0]); wx.sunset = hhmmToMin(j.daily.sunset[0]); } catch (e) {}
     return wx;
 }
@@ -203,7 +204,8 @@ function parseMetNo(j) {
 }
 
 // Sunrise and sunset from coordinates (NOAA formulas), local time, minutes from midnight.
-function sunCalc(lat, lon) {
+// tz - UTC offset of the place in minutes; omitted - the system time zone.
+function sunCalc(lat, lon, tz) {
     var now = new Date();
     var doy = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000);
     var gm = 2 * Math.PI / 365 * (doy - 0.5);
@@ -216,7 +218,7 @@ function sunCalc(lat, lon) {
     var c = Math.cos(90.833 * Math.PI / 180) / (Math.cos(la) * Math.cos(dec)) - Math.tan(la) * Math.tan(dec);
     c = Math.max(-0.999, Math.min(0.999, c));
     var ha = Math.acos(c) * 180 / Math.PI;
-    var tz = -now.getTimezoneOffset();
+    if (tz === undefined || tz === null) tz = -now.getTimezoneOffset();
     return { sr: ((720 - 4 * (lon + ha) - eq + tz) % 1440 + 1440) % 1440,
              ss: ((720 - 4 * (lon - ha) - eq + tz) % 1440 + 1440) % 1440 };
 }

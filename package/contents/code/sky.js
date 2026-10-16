@@ -113,9 +113,20 @@ function skyWeather(wx) {
     return null;
 }
 
+// UTC offset of the place in minutes, when the weather told it; null - system time zone.
+function placeTz(wx) { return wx && wx.offset !== undefined && wx.offset !== null ? wx.offset : null; }
+
+// Minutes since midnight at the place.
+function placeMinutes(wx) {
+    var now = new Date(), tz = placeTz(wx);
+    if (tz === null) return now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
+    var m = now.getUTCHours() * 60 + now.getUTCMinutes() + now.getUTCSeconds() / 60 + tz;
+    return ((m % 1440) + 1440) % 1440;
+}
+
 function sunTimes(wx, place) {
     if (wx && wx.sunrise !== null && wx.sunset !== null) return { sr: wx.sunrise, ss: wx.sunset };
-    if (place) return P.sunCalc(place.lat, place.lon);
+    if (place) return P.sunCalc(place.lat, place.lon, placeTz(wx));
     return { sr: 420.0, ss: 1140.0 };
 }
 
@@ -154,7 +165,7 @@ function step(ctx, w, h, env) {
         Clouds.forEach(function (c) { if (c.x < 0) c.x = Math.random() * w; });
     }
     var st = sunTimes(env.wx, env.place), sr = st.sr, ss = st.ss;
-    var now = new Date(), t = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
+    var t = placeMinutes(env.wx);
     if (s.force === "dawn") t = sr - 10;
     else if (s.force === "day") t = (sr + ss) / 2;
     else if (s.force === "dusk") t = ss + 10;

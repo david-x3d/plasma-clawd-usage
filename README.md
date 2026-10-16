@@ -98,8 +98,10 @@ Behind the numbers is a faint sky that follows real sunrise and sunset, the
 moon in its actual phase, and live weather: clouds, rain, snow, fog and
 thunderstorms. Weather comes from [Open-Meteo](https://open-meteo.com), falling
 back to [met.no](https://api.met.no); location is looked up once by IP via
-[ipwho.is](https://ipwho.is). Set coordinates in the settings to skip that, or
-turn the sky off.
+[ipwho.is](https://ipwho.is). To show another place, enter a **city** in the
+settings (looked up via Open-Meteo geocoding) or exact coordinates: the sky
+then follows that city's weather and its local time of day. You can also turn
+the sky off.
 
 ## Where the data comes from
 

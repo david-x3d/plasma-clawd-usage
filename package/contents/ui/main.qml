@@ -57,6 +57,8 @@ PlasmoidItem {
     property real wxTry: 0
     property bool wxAlt: false
     property string wxPlace: ""
+    property var cityGeo: null       // { lat, lon, city, for: <name as typed> }
+    property real cityTry: 0
 
     // ---- texts shown by the card ----
     property string pctText: "--"
@@ -295,11 +297,31 @@ PlasmoidItem {
             var la = parseFloat(cfg.weatherLat), lo = parseFloat(cfg.weatherLon);
             if (!isNaN(la) && !isNaN(lo)) return { lat: la, lon: lo, city: null };
         }
+        var c = String(cfg.weatherCity || "").trim();
+        if (c !== "") return cityGeo && cityGeo["for"] === c ? cityGeo : null;
         return geo;
     }
 
     function startWeather() {
         var pl = place();
+        var cityName = String(cfg.weatherCity || "").trim();
+        if (!pl && cityName !== "" && (String(cfg.weatherLat) === "" || String(cfg.weatherLon) === "")) {
+            // A city from the settings - look up its coordinates (Open-Meteo geocoding, no key).
+            if (Date.now() - cityTry < 60000) return;
+            cityTry = Date.now();
+            get("https://geocoding-api.open-meteo.com/v1/search?count=1&name=" + encodeURIComponent(cityName) +
+                "&language=" + lang, function (txt) {
+                try {
+                    var r = JSON.parse(txt).results[0];
+                    cityGeo = { lat: +r.latitude, lon: +r.longitude, city: String(r.name), "for": cityName };
+                    wx = null; wxTry = 0;
+                    Sky.Sky.key = "";
+                    updateSkyTip();
+                    updateWidget();
+                } catch (e) {}
+            });
+            return;
+        }
         if (!pl) {
             // No coordinates - first find the location by IP, ask for weather next tick.
             if (Date.now() - geoTry < 600000) return;
@@ -371,8 +393,8 @@ PlasmoidItem {
         if (cfg.showStatus && now - statusTry >= cfg.statusIntervalSeconds * 1000) startStatus();
         if (cfg.showAccount && now - authTry >= cfg.accountIntervalSeconds * 1000) startAuth();
         startChangelog();
-        var pl = cfg.weatherLat + "|" + cfg.weatherLon;
-        if (pl !== wxPlace) { wxPlace = pl; wxTry = 0; }
+        var pl = cfg.weatherLat + "|" + cfg.weatherLon + "|" + cfg.weatherCity;
+        if (pl !== wxPlace) { if (wxPlace !== "") wx = null; wxPlace = pl; wxTry = 0; cityTry = 0; Sky.Sky.key = ""; updateSkyTip(); }
         if (skyOn && now - wxTry >= cfg.weatherIntervalSeconds * 1000) startWeather();
 
         var real = usage;

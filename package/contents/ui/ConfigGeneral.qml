@@ -16,6 +16,7 @@ KCM.SimpleKCM {
     property alias cfg_showAccount: showAccount.checked
     property alias cfg_showMascot: showMascot.checked
     property alias cfg_showSky: showSky.checked
+    property alias cfg_weatherCity: city.text
     property alias cfg_weatherLat: lat.text
     property alias cfg_weatherLon: lon.text
     property alias cfg_refreshSeconds: refresh.value
@@ -53,6 +54,11 @@ KCM.SimpleKCM {
         QQC2.CheckBox { id: showMascot; text: "Clawd" }
         QQC2.CheckBox { id: showSky; text: "Sky and weather" }
         QQC2.CheckBox { id: devMode; Kirigami.FormData.label: "Clawd:"; text: "Developer mode (right-click Clawd)" }
+        QQC2.TextField {
+            id: city
+            Kirigami.FormData.label: "City for sky and weather:"
+            placeholderText: "by IP, e.g. Berlin or Tokyo"
+        }
         QQC2.TextField { id: lat; Kirigami.FormData.label: "Weather latitude:"; placeholderText: "by IP" }
         QQC2.TextField { id: lon; Kirigami.FormData.label: "Weather longitude:"; placeholderText: "by IP" }
         QQC2.SpinBox { id: refresh; Kirigami.FormData.label: "Refresh, s:"; from: 1; to: 3600 }

@@ -21,6 +21,7 @@
     <entry name="showMascot" type="Bool"><default>true</default></entry>
     <entry name="showSky" type="Bool"><default>true</default></entry>
     <entry name="weatherIntervalSeconds" type="Int"><default>900</default></entry>
+    <entry name="weatherCity" type="String"><default></default></entry>
     <entry name="weatherLat" type="String"><default></default></entry>
     <entry name="weatherLon" type="String"><default></default></entry>
     <entry name="language" type="String"><default>auto</default></entry>
