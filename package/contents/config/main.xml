@@ -23,6 +23,7 @@
     <entry name="weatherIntervalSeconds" type="Int"><default>900</default></entry>
     <entry name="weatherLat" type="String"><default></default></entry>
     <entry name="weatherLon" type="String"><default></default></entry>
-    <entry name="language" type="String"><default>en</default></entry>
+    <entry name="language" type="String"><default>auto</default></entry>
+    <entry name="devMode" type="Bool"><default>false</default></entry>
   </group>
 </kcfg>

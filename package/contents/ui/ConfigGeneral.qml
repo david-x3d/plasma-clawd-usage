@@ -2,9 +2,10 @@ import QtQuick
 import QtQuick.Controls as QQC2
 import org.kde.kirigami as Kirigami
 import org.kde.kcmutils as KCM
+import "../code/strings.js" as S
 
 KCM.SimpleKCM {
-    property alias cfg_language: language.currentValue
+    property string cfg_language
     property real cfg_scale
     property real cfg_opacity
     property alias cfg_warnPercent: warn.value
@@ -24,13 +25,17 @@ KCM.SimpleKCM {
     property alias cfg_accountIntervalSeconds: accountI.value
     property alias cfg_weatherIntervalSeconds: weatherI.value
     property bool cfg_expanded
+    property alias cfg_devMode: devMode.checked
 
     Kirigami.FormLayout {
         QQC2.ComboBox {
             id: language
             Kirigami.FormData.label: "Language:"
             textRole: "text"; valueRole: "value"
-            model: [{ text: "English", value: "en" }, { text: "Русский", value: "ru" }]
+            onActivated: cfg_language = currentValue
+            model: [{ text: S.T(cfg_language, "lang.auto"), value: "auto" }].concat(
+                Object.keys(S.Languages).map(function (k) { return { text: S.Languages[k], value: k }; }))
+            Component.onCompleted: currentIndex = Math.max(0, indexOfValue(cfg_language))
         }
         QQC2.SpinBox {
             Kirigami.FormData.label: "Scale (%):"
@@ -47,6 +52,7 @@ KCM.SimpleKCM {
         QQC2.CheckBox { id: showAccount; text: "Account" }
         QQC2.CheckBox { id: showMascot; text: "Clawd" }
         QQC2.CheckBox { id: showSky; text: "Sky and weather" }
+        QQC2.CheckBox { id: devMode; Kirigami.FormData.label: "Clawd:"; text: "Developer mode (right-click Clawd)" }
         QQC2.TextField { id: lat; Kirigami.FormData.label: "Weather latitude:"; placeholderText: "by IP" }
         QQC2.TextField { id: lon; Kirigami.FormData.label: "Weather longitude:"; placeholderText: "by IP" }
         QQC2.SpinBox { id: refresh; Kirigami.FormData.label: "Refresh, s:"; from: 1; to: 3600 }

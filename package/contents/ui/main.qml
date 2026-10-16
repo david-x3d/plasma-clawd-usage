@@ -143,14 +143,26 @@ PlasmoidItem {
         },
         PlasmaCore.Action { isSeparator: true },
         PlasmaCore.Action {
-            text: root.t("menu.language") + ": English"; checkable: true; checked: root.lang === "en"
-            onTriggered: Plasmoid.configuration.language = "en"
-        },
-        PlasmaCore.Action {
-            text: root.t("menu.language") + ": Русский"; checkable: true; checked: root.lang === "ru"
-            onTriggered: Plasmoid.configuration.language = "ru"
+            text: root.t("menu.devMode"); icon.name: "tools"
+            checkable: true; checked: root.cfg.devMode
+            onTriggered: root.setDevMode(!root.cfg.devMode)
         }
     ]
+
+    // Developer mode off - back to live data: drop every forced state.
+    function setDevMode(on) {
+        Plasmoid.configuration.devMode = on;
+        if (!on) {
+            M.stopDemo();
+            M.Mz.forceHearts = null;
+            Sky.Sky.force = null; Sky.Sky.forceWx = null; Sky.Sky.key = "";
+            updateSkyTip();
+        }
+    }
+    Connections {
+        target: Plasmoid.configuration
+        function onDevModeChanged() { if (!root.cfg.devMode) root.setDevMode(false); }
+    }
 
     function setDetails(open) { Plasmoid.configuration.expanded = open; }
     function hideWindow() { if (!onDesktop) expanded = false; }

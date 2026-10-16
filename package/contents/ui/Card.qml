@@ -222,7 +222,7 @@ Item {
                     onClicked: function (mouse) {
                         var on = onMascot(mouse.x, mouse.y);
                         if (mouse.button === Qt.RightButton) {
-                            if (on || card.app.skyOn) devMenu.popup();
+                            if (card.app.cfg.devMode && (on || card.app.skyOn)) devMenu.popup();
                         } else if (on) {
                             M.click();
                         }

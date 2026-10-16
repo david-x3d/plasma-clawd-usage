@@ -61,8 +61,14 @@ The ▾ in the header expands details: last 24 hours / 7 days stats from
 `/usage`, and your Claude Code version. When an update is out the line turns
 yellow; hover for the changelog, click to run `claude update` in Konsole.
 
-Right-click the widget for refresh, larger/smaller and language (English,
-Русский). All other settings are in **Configure Clawd Usage…**.
+Right-click the widget for refresh, larger/smaller and the developer mode
+toggle. Everything else, including the language, is in **Configure Clawd Usage…**.
+
+**Languages:** English, Deutsch, Français, Español, Italiano, Português,
+Nederlands, Polski, Русский, Українська, Türkçe, العربية, हिन्दी, 中文, 日本語 and
+한국어. By default the widget follows your system language. All UI text lives
+in `package/contents/code/strings.js`, so adding a language means adding one
+more table there.
 
 ### Clawd
 
@@ -81,8 +87,10 @@ Right-click the widget for refresh, larger/smaller and language (English,
 </tr>
 </table>
 
-Right-click Clawd for developer mode: force any state, play any animation, set
-the hearts, pick time of day and weather, or play everything as a demo.
+Turn on **Developer mode** (right-click the widget, or in the settings), then
+right-click Clawd to force any state, play any animation, set the hearts, pick
+time of day and weather, or play everything as a demo. Turning developer mode
+off goes back to live data.
 
 ### Sky
 
