@@ -1,0 +1,15 @@
+{
+    "KPackageStructure": "Plasma/Applet",
+    "KPlugin": {
+        "Authors": [{ "Name": "David" }],
+        "Category": "System Information",
+        "Description": "How much of your Claude plan limits you've used, with Clawd living in it",
+        "Icon": "utilities-system-monitor",
+        "Id": "com.github.david-x3d.plasma-clawd-usage",
+        "License": "MIT",
+        "Name": "Clawd Usage",
+        "Version": "1.0",
+        "Website": "https://github.com/david-x3d/plasma-clawd-usage"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0"
+}
