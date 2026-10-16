@@ -38,16 +38,13 @@ PlasmoidItem {
     property var usage: null
     property real usageAt: 0
     property real usageTry: 0
-    property bool usageBusy: false
     property bool noClaude: false
     property var account: null
     property real authTry: 0
-    property bool authBusy: false
     property var status: null
     property real statusAt: 0
     property real statusTry: 0
     property var sessions: []
-    property bool sessBusy: false
     property string verLocal: ""
     property string verLatest: ""
     property real verAt: 0
@@ -164,15 +161,20 @@ PlasmoidItem {
         engine: "executable"
         connectedSources: []
         property var cbs: ({})
+        property var started: ({})
         onNewData: function (src, data) {
             var cb = cbs[src];
             delete cbs[src];
+            delete started[src];
             disconnectSource(src);
-            if (cb) cb(String(data.stdout || ""), data["exit code"]);
+            if (cb) try { cb(String(data.stdout || ""), data["exit code"]); } catch (e) { console.warn("clawd-usage:", src.substr(0, 40), e); }
         }
         function run(cmd, cb) {
-            if (cbs[cmd]) return;
+            // A command that never answered (lost or hung) is retried after two minutes.
+            if (cbs[cmd] && Date.now() - started[cmd] < 120000) return;
+            if (cbs[cmd]) disconnectSource(cmd);
             cbs[cmd] = cb;
+            started[cmd] = Date.now();
             connectSource(cmd);
         }
     }
@@ -189,11 +191,8 @@ PlasmoidItem {
     }
 
     function startUsage() {
-        if (usageBusy) return;
-        usageBusy = true;
         usageTry = Date.now();
         exec.run(claude + " -p /usage --output-format text </dev/null", function (out, code) {
-            usageBusy = false;
             noClaude = code === 127;
             var u = P.parseUsage(out);
             if (u) { usage = u; usageAt = Date.now(); }
@@ -202,11 +201,8 @@ PlasmoidItem {
     }
 
     function startAuth() {
-        if (authBusy) return;
-        authBusy = true;
         authTry = Date.now();
         exec.run(claude + " auth status </dev/null", function (out) {
-            authBusy = false;
             var a = P.parseAuth(out);
             if (a) account = a;
         });
@@ -220,10 +216,7 @@ PlasmoidItem {
         "printf '%s\\t' \"$(sed 's/.*) //' /proc/$p/stat | cut -d' ' -f20)\"; tr -d '\\n' <\"$f\"; echo; done"
 
     function startSessions() {
-        if (sessBusy) return;
-        sessBusy = true;
         exec.run(sessionsCmd, function (out) {
-            sessBusy = false;
             sessions = P.parseSessions(out);
             updateSessions();
         });
@@ -475,15 +468,20 @@ PlasmoidItem {
         }
     }
 
-    onLangChanged: { updateSkyTip(); updateWidget(); }
+    property bool ready: false
+    onLangChanged: if (ready) { updateSkyTip(); updateWidget(); }
 
     Timer {
         interval: Math.max(1, root.cfg.refreshSeconds) * 1000
-        repeat: true; running: true; triggeredOnStart: true
+        repeat: true; running: true
         onTriggered: {
+            if (!root.ready) return;
             try { root.updateWidget(); } catch (e) { root.lineStamp = root.t("error"); console.warn("clawd-usage:", e); }
         }
     }
+
+    // First tick once the executable engine is up: commands sent before that are lost.
+    Timer { interval: 500; running: true; onTriggered: { root.ready = true; root.updateWidget(); } }
 
     Component.onCompleted: updateSkyTip()
 }
