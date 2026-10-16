@@ -16,7 +16,7 @@ import "../code/mascot.js" as M
 import "../code/sky.js" as Sky
 
 PlasmoidItem {
-    id: app
+    id: root
 
     readonly property var cfg: Plasmoid.configuration
     readonly property string lang: S.lang(cfg.language)
@@ -96,7 +96,7 @@ PlasmoidItem {
     toolTipSubText: ""
 
     fullRepresentation: Card {
-        app: app
+        app: root
         Layout.preferredWidth: implicitWidth
         Layout.preferredHeight: implicitHeight
         Layout.minimumWidth: implicitWidth
@@ -108,49 +108,49 @@ PlasmoidItem {
     // Tray icon: the session percentage as a colored number.
     compactRepresentation: MouseArea {
         Layout.minimumWidth: height
-        onClicked: app.expanded = !app.expanded
+        onClicked: root.expanded = !root.expanded
         Rectangle {
             anchors.centerIn: parent
             width: Math.min(parent.width, parent.height) * 31 / 32
             height: width
             radius: width / 2
-            color: app.trayColor
+            color: root.trayColor
             Text {
                 anchors.centerIn: parent
-                text: app.trayText
+                text: root.trayText
                 color: "black"
                 font.family: "Segoe UI"
                 font.bold: true
-                font.pixelSize: parent.width * (app.trayText.length >= 3 ? 14 : 17) / 32
+                font.pixelSize: parent.width * (root.trayText.length >= 3 ? 14 : 17) / 32
             }
         }
     }
 
     Plasmoid.contextualActions: [
         PlasmaCore.Action {
-            text: app.t("menu.toggle"); icon.name: "window"
-            visible: !app.onDesktop
-            onTriggered: app.expanded = !app.expanded
+            text: root.t("menu.toggle"); icon.name: "window"
+            visible: !root.onDesktop
+            onTriggered: root.expanded = !root.expanded
         },
         PlasmaCore.Action {
-            text: app.t("menu.refresh"); icon.name: "view-refresh"
-            onTriggered: { app.usageTry = 0; app.startUsage(); }
+            text: root.t("menu.refresh"); icon.name: "view-refresh"
+            onTriggered: { root.usageTry = 0; root.startUsage(); }
         },
         PlasmaCore.Action {
-            text: app.t("menu.bigger"); icon.name: "zoom-in"
-            onTriggered: Plasmoid.configuration.scale = Math.min(4.0, Math.round((app.cfg.scale + 0.1) * 100) / 100)
+            text: root.t("menu.bigger"); icon.name: "zoom-in"
+            onTriggered: Plasmoid.configuration.scale = Math.min(4.0, Math.round((root.cfg.scale + 0.1) * 100) / 100)
         },
         PlasmaCore.Action {
-            text: app.t("menu.smaller"); icon.name: "zoom-out"
-            onTriggered: Plasmoid.configuration.scale = Math.max(0.6, Math.round((app.cfg.scale - 0.1) * 100) / 100)
+            text: root.t("menu.smaller"); icon.name: "zoom-out"
+            onTriggered: Plasmoid.configuration.scale = Math.max(0.6, Math.round((root.cfg.scale - 0.1) * 100) / 100)
         },
         PlasmaCore.Action { isSeparator: true },
         PlasmaCore.Action {
-            text: app.t("menu.language") + ": English"; checkable: true; checked: app.lang === "en"
+            text: root.t("menu.language") + ": English"; checkable: true; checked: root.lang === "en"
             onTriggered: Plasmoid.configuration.language = "en"
         },
         PlasmaCore.Action {
-            text: app.t("menu.language") + ": Русский"; checkable: true; checked: app.lang === "ru"
+            text: root.t("menu.language") + ": Русский"; checkable: true; checked: root.lang === "ru"
             onTriggered: Plasmoid.configuration.language = "ru"
         }
     ]
@@ -478,10 +478,10 @@ PlasmoidItem {
     onLangChanged: { updateSkyTip(); updateWidget(); }
 
     Timer {
-        interval: Math.max(1, app.cfg.refreshSeconds) * 1000
+        interval: Math.max(1, root.cfg.refreshSeconds) * 1000
         repeat: true; running: true; triggeredOnStart: true
         onTriggered: {
-            try { app.updateWidget(); } catch (e) { app.lineStamp = app.t("error"); console.warn("clawd-usage:", e); }
+            try { root.updateWidget(); } catch (e) { root.lineStamp = root.t("error"); console.warn("clawd-usage:", e); }
         }
     }
 
